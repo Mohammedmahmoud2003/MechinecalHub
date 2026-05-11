@@ -1,8 +1,31 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "HRSystem";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-panel">
+    <div class="hero-copy">
+        <p class="hero-kicker">Human resources platform</p>
+        <h1>HRSystem for leave, rotations, tasks, and admin workflows</h1>
+        <p class="hero-text">
+            Manage employee operations from one ASP.NET Core MVC application with Identity, EF Core, and live updates.
+        </p>
+        <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="http://mechanicalhub.somee.com/" target="_blank" rel="noopener">Open Live Demo</a>
+            <a class="btn btn-outline-secondary btn-lg" asp-area="Identity" asp-page="/Account/Login">Sign In</a>
+        </div>
+    </div>
+
+    <div class="hero-card">
+        <h2>What it covers</h2>
+        <ul>
+            <li>Employee dashboards</li>
+            <li>Leave requests and approvals</li>
+            <li>Daily and rotation task management</li>
+            <li>Admin users, roles, and settings</li>
+            <li>Change log activity tracking</li>
+        </ul>
+        <p class="hero-footnote">
+            Published site: <a href="http://mechanicalhub.somee.com/" target="_blank" rel="noopener">mechanicalhub.somee.com</a>
+        </p>
+    </div>
 </div>

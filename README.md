@@ -8,6 +8,14 @@ The published app is available at:
 
 http://mechanicalhub.somee.com/
 
+## Screenshots
+
+![Login page](docs/screenshots/login.png)
+
+![Admin dashboard](docs/screenshots/dashboard.png)
+
+![Admin users](docs/screenshots/admin-users.png)
+
 ## Features
 
 - ASP.NET Core MVC with Razor views
