@@ -2,6 +2,12 @@
 
 HRSystem is an ASP.NET Core MVC application for managing core HR workflows such as employees, roles, leave requests, rotations, tasks, and admin activity.
 
+## Live Demo
+
+The published app is available at:
+
+http://mechanicalhub.somee.com/
+
 ## Features
 
 - ASP.NET Core MVC with Razor views
@@ -60,4 +66,3 @@ The project includes EF Core migrations under `Data/Migrations`. The database is
 
 - The repository ignores build output, IDE files, and local database files.
 - The app uses ASP.NET Identity, so the first startup may create the required schema and seed roles automatically.
-
