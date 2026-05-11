@@ -1,0 +1,87 @@
+@model DailyTaskTemplatesViewModel
+@{
+    ViewData["Title"] = "Daily tasks";
+}
+
+<div class="task-page-shell">
+    <section class="task-hero mb-4">
+        <div class="task-hero__content">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Daily templates</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">@Model.TotalCount total</span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Manage reusable daily tasks.</h1>
+            <p class="lead mb-4 text-white-50">
+                Store the tasks you repeat every day once, then load them onto the task board whenever you need them.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-action="CreateDaily">Add daily template</a>
+                <a class="btn btn-outline-light btn-lg px-4" asp-action="Index">Back to task management</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="task-table-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">Daily task templates</h2>
+                <p class="text-muted mb-0">
+                    These templates are stored once and copied to the task board when you load daily tasks.
+                </p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge text-bg-light text-dark border">Title</span>
+                <span class="badge text-bg-light text-dark border">Sort order</span>
+                <span class="badge text-bg-light text-dark border">Updated</span>
+            </div>
+        </div>
+
+        @if (!Model.Templates.Any())
+        {
+            <div class="empty-state">
+                <h3 class="h5 fw-bold mb-2">No daily templates yet</h3>
+                <p class="text-muted mb-3">Add the tasks you repeat every day, then load them onto the board whenever needed.</p>
+                <a class="btn btn-primary" asp-action="CreateDaily">Add daily template</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle table-hover task-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Sort</th>
+                            <th>Updated</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var template in Model.Templates)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@template.Title</td>
+                                <td>
+                                    <span class="text-muted">@(string.IsNullOrWhiteSpace(template.Description) ? "-" : template.Description)</span>
+                                </td>
+                                <td>@template.SortOrder</td>
+                                <td class="text-nowrap">
+                                    @(template.UpdatedAtUtc?.ToString("g") ?? template.CreatedAtUtc.ToString("g"))
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-secondary" asp-action="EditDaily" asp-route-id="@template.Id">Edit</a>
+                                    <form asp-action="DeleteDaily" method="post" class="d-inline" onsubmit="return confirm('Delete @template.Title? This cannot be undone.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@template.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

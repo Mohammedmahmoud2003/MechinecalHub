@@ -1,0 +1,81 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="auth-shell">
+    <div class="row g-0 auth-card shadow-lg">
+        <div class="col-lg-5 auth-brand-panel text-white p-4 p-md-5">
+            <div class="d-flex flex-column h-100 justify-content-between">
+                <div>
+                    <span class="badge rounded-pill text-bg-light text-primary mb-4 px-3 py-2">MechincalHub</span>
+                    <h1 class="display-6 fw-bold mb-3">Create your workspace</h1>
+                    <p class="lead text-white-50 mb-4">
+                        Join your HR portal and start using leave, tasks, and rotation tools in a clean, focused workspace.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7 bg-body p-4 p-md-5">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Register</h2>
+                    <p class="text-body-secondary mb-0">Create a new account with a secure password.</p>
+                </div>
+                <span class="badge text-bg-success-subtle text-success-emphasis rounded-pill px-3 py-2">New account</span>
+            </div>
+
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="auth-form">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.ArabicName" class="form-control" autocomplete="name" placeholder="Arabic name" />
+                    <label asp-for="Input.ArabicName"></label>
+                    <span asp-validation-for="Input.ArabicName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.EmployeeCode" class="form-control" autocomplete="off" placeholder="Code" />
+                    <label asp-for="Input.EmployeeCode"></label>
+                    <span asp-validation-for="Input.EmployeeCode" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.JobTitle" class="form-control" autocomplete="organization-title" placeholder="Job title" />
+                    <label asp-for="Input.JobTitle"></label>
+                    <span asp-validation-for="Input.JobTitle" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                    <label asp-for="Input.Email"></label>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password" />
+                    <label asp-for="Input.Password"></label>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm password" />
+                    <label asp-for="Input.ConfirmPassword"></label>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button id="registerSubmit" type="submit" class="btn btn-success btn-lg w-100">Create account</button>
+                <div class="text-center mt-3">
+                    <a class="link-primary text-decoration-none" asp-area="Identity" asp-page="/Account/Login">
+                        Already registered? Sign in instead
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

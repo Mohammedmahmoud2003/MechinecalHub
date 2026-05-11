@@ -1,0 +1,158 @@
+@using System
+@model HRSystem.Models.AdminUsersViewModel
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="admin-page-shell">
+    <section class="admin-user-hero mb-4">
+        <div class="admin-user-hero__main">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">User Management</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">Admin Only</span>
+            </div>
+            <h1 class="h2 fw-bold mb-2">Manage accounts and assign roles from one place.</h1>
+            <p class="text-white-75 mb-4">
+                Change a user between Admin, Supervisor, and User without leaving the page. Role changes are saved safely with validation.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light" asp-area="Identity" asp-page="/Account/Register">Create account</a>
+                <a class="btn btn-outline-light" asp-action="ImportEmployees">Import workbook</a>
+            </div>
+        </div>
+
+        <div class="admin-user-hero__side">
+            <div class="admin-user-metric">
+                <span class="admin-user-metric__label">Workflow</span>
+                <strong class="admin-user-metric__value">Create, assign, review</strong>
+            </div>
+            <div class="admin-user-metric">
+                <span class="admin-user-metric__label">Access</span>
+                <strong class="admin-user-metric__value">Admin / Supervisor / User</strong>
+            </div>
+            <div class="admin-user-metric">
+                <span class="admin-user-metric__label">Status</span>
+                <strong class="admin-user-metric__value">Live role control</strong>
+            </div>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <div class="alert alert-info border-0 shadow-sm mb-4">@Model.StatusMessage</div>
+    }
+
+    <section class="admin-panel-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="h4 fw-bold mb-1">Accounts</h2>
+                <p class="text-muted mb-0">Use the edit screen and delete action to manage employee accounts and profiles.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge text-bg-dark">@Model.Users.Pagination.TotalCount users</span>
+                <span class="badge text-bg-primary">3 roles</span>
+                <span class="badge text-bg-light text-dark border">Self-change blocked</span>
+                <a class="badge text-bg-success text-decoration-none" asp-action="Activity">Live changes</a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Arabic name</th>
+                        <th>Code</th>
+                        <th>Job title</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@user.UserName</div>
+                                @if (user.IsCurrentUser)
+                                {
+                                    <small class="text-muted">Current signed-in admin</small>
+                                }
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(user.ArabicName) ? "—" : user.ArabicName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(user.EmployeeCode) ? "—" : user.EmployeeCode)</td>
+                            <td>@(string.IsNullOrWhiteSpace(user.JobTitle) ? "—" : user.JobTitle)</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <span class="badge rounded-pill text-bg-light text-dark border">@user.CurrentRoleLabel</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex flex-column align-items-end gap-2">
+                                    <form asp-action="UpdateRole" method="post" class="d-inline-flex flex-wrap gap-2 justify-content-end align-items-center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        @if (user.IsCurrentUser)
+                                        {
+                                            <select class="form-select form-select-sm admin-role-select" name="role" disabled>
+                                                @foreach (var option in Model.RoleOptions)
+                                                {
+                                                    if (string.Equals(option.Value, user.CurrentRole, StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        <option value="@option.Value" selected="selected">@option.Label</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@option.Value">@option.Label</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <button class="btn btn-sm btn-primary" type="submit" disabled>Save</button>
+                                        }
+                                        else
+                                        {
+                                            <select class="form-select form-select-sm admin-role-select" name="role">
+                                                @foreach (var option in Model.RoleOptions)
+                                                {
+                                                    if (string.Equals(option.Value, user.CurrentRole, StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        <option value="@option.Value" selected="selected">@option.Label</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@option.Value">@option.Label</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                                        }
+                                    </form>
+
+                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete @user.Email? This cannot be undone.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            @if (user.IsCurrentUser)
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger" type="submit" disabled>Delete</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                            }
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @await Html.PartialAsync("_Pagination", Model.Users.Pagination)
+    </section>
+</div>

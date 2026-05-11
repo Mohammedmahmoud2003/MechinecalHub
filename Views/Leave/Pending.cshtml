@@ -1,0 +1,114 @@
+@model LeavePendingViewModel
+@{
+    ViewData["Title"] = "Review leave requests";
+    var usersById = ViewBag.UserNamesById as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var items = Model.Requests.Items;
+}
+
+<div class="task-page-shell">
+    <section class="task-hero mb-4">
+        <div class="task-hero__content">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Review Queue</span>
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">@Model.Requests.Pagination.TotalCount pending</span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Approve or reject leave requests with less friction.</h1>
+            <p class="lead mb-4 text-white-50">
+                These are pending requests from other employees. Open a card for full context before making a decision.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-action="Index">All requests</a>
+                <a class="btn btn-outline-light btn-lg px-4" asp-controller="Dashboard" asp-action="Index">Back to home</a>
+            </div>
+        </div>
+
+        <div class="task-hero__stats">
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Waiting</span>
+                <strong class="task-hero__stat-value">@Model.Requests.Pagination.TotalCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Reviewed today</span>
+                <strong class="task-hero__stat-value">0</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Open focus</span>
+                <strong class="task-hero__stat-value">Approvals</strong>
+            </div>
+        </div>
+    </section>
+
+    @if (items.Count == 0)
+    {
+        <div class="empty-state">
+            <h3 class="h5 fw-bold mb-2">Nothing waiting for your review</h3>
+            <p class="text-muted mb-0">When colleagues submit leave, pending requests will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in items)
+            {
+                var days = item.EndDate.DayNumber - item.StartDate.DayNumber + 1;
+                var employeeName = !string.IsNullOrWhiteSpace(item.EmployeeUserId) && usersById.TryGetValue(item.EmployeeUserId, out var displayName)
+                    ? displayName
+                    : item.EmployeeUserId;
+
+                <div class="col-12">
+                    <div class="task-table-card pending-leave-card">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-4">
+                            <div class="pending-leave-card__summary">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <span class="badge text-bg-warning text-dark rounded-pill">Pending</span>
+                                    <span class="text-muted small">Submitted @item.SubmittedAtUtc.ToString("g") UTC</span>
+                                </div>
+                                <h2 class="h5 fw-bold mb-1">
+                                    @item.StartDate to @item.EndDate
+                                </h2>
+                                <p class="text-muted mb-0">@days day@(days == 1 ? "" : "s") requested</p>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 pending-leave-card__actions">
+                                <form asp-action="Approve" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="returnTo" value="queue" />
+                                    <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
+                                <form asp-action="Reject" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="returnTo" value="queue" />
+                                    <button type="submit" class="btn btn-outline-danger">Reject</button>
+                                </form>
+                                <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 pt-2">
+                            <div class="col-lg-4">
+                                <div class="admin-stack__item h-100">
+                                    <span class="admin-stack__title">Employee</span>
+                                    <span class="admin-stack__text">@employeeName</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="admin-stack__item h-100">
+                                    <span class="admin-stack__title">Duration</span>
+                                    <span class="admin-stack__text">@days day@(days == 1 ? "" : "s")</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="admin-stack__item h-100">
+                                    <span class="admin-stack__title">Reason</span>
+                                    <span class="admin-stack__text">@(string.IsNullOrWhiteSpace(item.Reason) ? "No reason provided" : item.Reason)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @await Html.PartialAsync("_Pagination", Model.Requests.Pagination)
+    }
+</div>

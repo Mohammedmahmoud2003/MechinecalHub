@@ -1,0 +1,89 @@
+@using System.Security.Claims
+@model TaskItem
+@{
+    ViewData["Title"] = "Task details";
+    var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var assignedTo = ViewBag.AssignedToUserName as string;
+}
+
+<div class="task-detail-shell">
+    <section class="task-detail-hero mb-4">
+        <div>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Task Details</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">@Model.Status</span>
+            </div>
+            <h1 class="h2 fw-bold mb-2">@Model.Title</h1>
+            <p class="text-white-50 mb-0">@((Model.Description?.Length ?? 0) > 0 ? Model.Description : "No description provided.")</p>
+        </div>
+
+        <div class="task-detail-hero__meta">
+            <div>
+                <span class="task-detail-hero__label">Assigned to</span>
+                <strong>@(assignedTo ?? "—")</strong>
+            </div>
+            <div>
+                <span class="task-detail-hero__label">Due date</span>
+                <strong>@(Model.DueDate?.ToString("d") ?? "—")</strong>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="task-detail-card">
+                <h2 class="h5 fw-bold mb-3">Task information</h2>
+                <dl class="row mb-0 task-detail-dl">
+                    <dt class="col-sm-4">Title</dt>
+                    <dd class="col-sm-8">@Model.Title</dd>
+
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><span class="badge bg-secondary rounded-pill">@Model.Status</span></dd>
+
+                    <dt class="col-sm-4">Due date</dt>
+                    <dd class="col-sm-8">@(Model.DueDate?.ToString("d") ?? "—")</dd>
+
+                    <dt class="col-sm-4">Assigned to</dt>
+                    <dd class="col-sm-8">@((assignedTo ?? "—"))</dd>
+
+                    <dt class="col-sm-4">Rotation</dt>
+                    <dd class="col-sm-8">@(Model.Rotation?.Title ?? "—")</dd>
+
+                    <dt class="col-sm-4">Created (UTC)</dt>
+                    <dd class="col-sm-8">@Model.CreatedAtUtc.ToString("g")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="task-detail-card h-100">
+                <h2 class="h5 fw-bold mb-3">Actions</h2>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit task</a>
+                    @if (Model.Status == TaskItemStatus.Pending)
+                    {
+                        <form asp-action="Approve" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success w-100">Approve</button>
+                        </form>
+                        <form asp-action="Reject" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-warning w-100">Reject</button>
+                        </form>
+                    }
+                    @if (Model.Status == TaskItemStatus.InProgress && string.Equals(Model.AssignedToUserId, uid, StringComparison.Ordinal))
+                    {
+                        <form asp-action="Complete" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success w-100">Mark complete</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

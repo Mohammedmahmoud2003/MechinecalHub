@@ -1,0 +1,108 @@
+@model RotationsIndexViewModel
+@{
+    ViewData["Title"] = "Rotations";
+    var items = Model.Rotations.Items;
+}
+
+<div class="task-page-shell">
+    <section class="task-hero mb-4">
+        <div class="task-hero__content">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Rotations</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">@Model.Rotations.Pagination.TotalCount total</span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Manage schedules and linked tasks with better visibility.</h1>
+            <p class="lead mb-4 text-white-50">
+                Keep an eye on planned, active, and completed rotations from a cleaner board built for review and editing.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-action="Create">New rotation</a>
+                <a class="btn btn-outline-light btn-lg px-4" asp-controller="Dashboard" asp-action="Index">Back to home</a>
+            </div>
+        </div>
+
+        <div class="task-hero__stats">
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Planned</span>
+                <strong class="task-hero__stat-value">@Model.PlannedCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Active</span>
+                <strong class="task-hero__stat-value">@Model.ActiveCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Completed</span>
+                <strong class="task-hero__stat-value">@Model.CompletedCount</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="task-table-card">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover task-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Imported</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!items.Any())
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state my-3">
+                                    <h3 class="h5 fw-bold mb-2">No rotations yet</h3>
+                                    <p class="text-muted mb-3">Create a rotation to start organizing linked work.</p>
+                                    <a class="btn btn-primary" asp-action="Create">Create rotation</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.Title</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <div class="text-muted small task-row-description">@item.Description</div>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var statusClass = item.Status switch
+                                        {
+                                            RotationStatus.Planned => "bg-info text-dark",
+                                            RotationStatus.Active => "bg-success",
+                                            RotationStatus.Completed => "bg-secondary",
+                                            RotationStatus.Cancelled => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass rounded-pill px-3 py-2">@item.Status</span>
+                                </td>
+                                <td class="text-nowrap">@item.StartAt.ToString("g")</td>
+                                <td class="text-nowrap">@item.EndAt.ToString("g")</td>
+                                <td class="text-nowrap">@item.ImportedAtUtc.ToLocalTime().ToString("g")</td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @await Html.PartialAsync("_Pagination", Model.Rotations.Pagination)
+    </section>
+</div>

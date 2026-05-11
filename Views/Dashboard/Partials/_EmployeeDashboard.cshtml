@@ -1,0 +1,190 @@
+@using System.Security.Claims
+@model DashboardViewModel
+
+<section class="task-hero mb-4">
+    <div class="task-hero__content">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Employee Workspace</span>
+            <span class="badge rounded-pill bg-primary px-3 py-2">Self Service</span>
+        </div>
+        <h1 class="display-6 fw-bold mb-3">Your work, leave, and rotation details in one place.</h1>
+        <p class="lead mb-4 text-white-50">
+            Use this space to keep track of attendance, submit leave, review assigned tasks, and follow your rotation schedule.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-light btn-lg px-4" asp-controller="Leave" asp-action="Create">Submit leave</a>
+            <a class="btn btn-outline-light btn-lg px-4" href="#my-tasks">My tasks</a>
+            <a class="btn btn-outline-light btn-lg px-4" href="#rotation-preview">View rotations</a>
+        </div>
+    </div>
+
+    <div class="task-hero__stats">
+        <div class="task-hero__stat">
+            <span class="task-hero__stat-label">Approved leave this month</span>
+            <strong class="task-hero__stat-value">@Model.Attendance.ApprovedLeaveDaysThisMonth</strong>
+        </div>
+        <div class="task-hero__stat">
+            <span class="task-hero__stat-label">Pending requests</span>
+            <strong class="task-hero__stat-value">@Model.Attendance.PendingLeaveRequests</strong>
+        </div>
+        <div class="task-hero__stat">
+            <span class="task-hero__stat-label">Active tasks</span>
+            <strong class="task-hero__stat-value">@Model.ActiveTasks.Count</strong>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card stat-card--primary">
+            <div class="stat-card__label">Attendance</div>
+            <div class="stat-card__value">@Model.Attendance.ApprovedLeaveDaysYearToDate</div>
+            <div class="stat-card__hint">Approved leave days YTD</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--teal">
+            <div class="stat-card__label">Leave requests</div>
+            <div class="stat-card__value">@Model.Attendance.PendingLeaveRequests</div>
+            <div class="stat-card__hint">Open requests in progress</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--indigo">
+            <div class="stat-card__label">Tasks</div>
+            <div class="stat-card__value">@Model.ActiveTasks.Count</div>
+            <div class="stat-card__hint">Assigned work items</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--slate">
+            <div class="stat-card__label">Rotation</div>
+            <div class="stat-card__value">@Model.Rotations.Count</div>
+            <div class="stat-card__hint">Visible schedule items</div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4" id="my-tasks">
+        <div class="admin-panel-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">My tasks</h2>
+                    <p class="text-muted mb-0">Review the tasks assigned to you and update progress when you're working on them.</p>
+                </div>
+            </div>
+
+        @if (Model.ActiveTasks.Count == 0)
+        {
+            <div class="empty-state">
+                <h3 class="h6 fw-bold mb-2">No assigned tasks right now</h3>
+                <p class="text-muted mb-0">When tasks are assigned to you, they will appear here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="admin-stack">
+                @foreach (var task in Model.ActiveTasks.Take(5))
+                {
+                    <div class="admin-stack__item">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <a class="admin-stack__title text-decoration-none" asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id">@task.Title</a>
+                                <span class="admin-stack__text">
+                                    @(task.Rotation?.Title ?? "No rotation linked")
+                                </span>
+                            </div>
+                            <span class="badge rounded-pill @(task.Status == TaskItemStatus.InProgress ? "bg-primary" : "bg-warning text-dark")">@task.Status</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id">Details</a>
+                            @if (task.Status == TaskItemStatus.InProgress)
+                            {
+                                <form asp-controller="Tasks" asp-action="Complete" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@task.Id" />
+                                    <button type="submit" class="btn btn-sm btn-success">Mark complete</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mb-4">
+        <div class="admin-panel-card">
+            <h2 class="h5 fw-bold mb-3">Quick actions</h2>
+            <div class="admin-action-list">
+                <a class="admin-action" href="#rotation-preview">
+                    <span class="admin-action__title">View rotation preview</span>
+                    <span class="admin-action__desc">See your current schedule and linked tasks</span>
+                </a>
+                <a class="admin-action" asp-controller="Leave" asp-action="Create">
+                    <span class="admin-action__title">Submit leave request</span>
+                    <span class="admin-action__desc">Request time off with a date range</span>
+                </a>
+                <div class="admin-action">
+                    <span class="admin-action__title">Check-in attendance</span>
+                    <span class="admin-action__desc">Coming soon - we can add this as a real flow next</span>
+                </div>
+            <div class="admin-action">
+                <span class="admin-action__title">Upload files or reports</span>
+                <span class="admin-action__desc">Coming soon - document upload can be added next</span>
+            </div>
+            <div class="admin-action">
+                <span class="admin-action__title">Submit permission request</span>
+                <span class="admin-action__desc">Coming soon - we can add a separate permission form next</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-6">
+        <div class="admin-panel-card h-100">
+            <h2 class="h5 fw-bold mb-3">Leave and attendance</h2>
+            <dl class="row mb-0 task-detail-dl">
+                <dt class="col-sm-5">Approved leave this month</dt>
+                <dd class="col-sm-7">@Model.Attendance.ApprovedLeaveDaysThisMonth days</dd>
+                <dt class="col-sm-5">Approved leave YTD</dt>
+                <dd class="col-sm-7">@Model.Attendance.ApprovedLeaveDaysYearToDate days</dd>
+                <dt class="col-sm-5">Pending requests</dt>
+                <dd class="col-sm-7">@Model.Attendance.PendingLeaveRequests</dd>
+                <dt class="col-sm-5">Next approved leave</dt>
+                <dd class="col-sm-7">@(Model.Attendance.NextApprovedLeaveStart?.ToString("d") ?? "-")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-lg-6" id="rotation-preview">
+        <div class="admin-panel-card h-100">
+            <h2 class="h5 fw-bold mb-3">Rotation preview</h2>
+            @if (Model.Rotations.Count == 0)
+            {
+                <div class="empty-state">
+                    <h3 class="h6 fw-bold mb-2">No rotations available</h3>
+                    <p class="text-muted mb-0">Rotation items will appear here once schedules are created.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-stack">
+                    @foreach (var rotation in Model.Rotations.Take(4))
+                    {
+                        <div class="admin-stack__item">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <span class="admin-stack__title">@rotation.Title</span>
+                                    <span class="admin-stack__text">@rotation.StartAt.ToString("g") - @rotation.EndAt.ToString("g")</span>
+                                </div>
+                                <span class="badge @(rotation.Status == RotationStatus.Active ? "bg-success" : "bg-info text-dark") rounded-pill">@rotation.Status</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>

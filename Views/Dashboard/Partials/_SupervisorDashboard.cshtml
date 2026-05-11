@@ -1,0 +1,165 @@
+@model DashboardViewModel
+
+<section class="admin-hero admin-hero--supervisor mb-4">
+    <div class="admin-hero__content">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Supervisor Workspace</span>
+            <span class="badge rounded-pill bg-info text-dark px-3 py-2">Approvals + Coordination</span>
+        </div>
+        <h1 class="display-5 fw-bold mb-3">Keep teams moving without admin overhead.</h1>
+        <p class="lead mb-4 opacity-90">
+            Supervisors approve leave, manage tasks and rotations, watch attendance, and work with non-admin users in one focused workspace.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-light btn-lg px-4" asp-controller="Leave" asp-action="Pending">Approve leave</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Tasks" asp-action="Index">Assign tasks</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Rotations" asp-action="Index">Manage rotations</a>
+        </div>
+    </div>
+
+    <div class="admin-hero__panel">
+        <div class="admin-hero__panel-label">Focus area</div>
+        <div class="admin-hero__panel-value">Team operations</div>
+        <p class="mb-4 text-white-50">Everything a supervisor needs should be within a couple of clicks.</p>
+
+        <div class="admin-hero__mini-grid">
+            <div>
+                <div class="admin-hero__mini-label">Leave requests</div>
+                <div class="admin-hero__mini-value">@Model.SupervisorSummary.PendingLeaveRequests</div>
+            </div>
+            <div>
+                <div class="admin-hero__mini-label">Open tasks</div>
+                <div class="admin-hero__mini-value">@Model.SupervisorSummary.OpenTasks</div>
+            </div>
+            <div>
+                <div class="admin-hero__mini-label">Rotations</div>
+                <div class="admin-hero__mini-value">@Model.SupervisorSummary.ActiveRotations</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card stat-card--primary">
+            <div class="stat-card__label">Leave approvals</div>
+            <div class="stat-card__value">@Model.SupervisorSummary.PendingLeaveRequests</div>
+            <div class="stat-card__hint">Requests ready for review</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--teal">
+            <div class="stat-card__label">Tasks</div>
+            <div class="stat-card__value">@Model.SupervisorSummary.OpenTasks</div>
+            <div class="stat-card__hint">Items to assign and track</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--indigo">
+            <div class="stat-card__label">Rotations</div>
+            <div class="stat-card__value">@Model.SupervisorSummary.ActiveRotations</div>
+            <div class="stat-card__hint">Schedules to monitor</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card--slate">
+            <div class="stat-card__label">Attendance reports</div>
+            <div class="stat-card__value">@Model.SupervisorSummary.AttendanceReports</div>
+            <div class="stat-card__hint">Employees with leave activity</div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="admin-panel-card h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">Supervisor actions</h2>
+                    <p class="text-muted mb-0">These are the day-to-day tools for a supervisor.</p>
+                </div>
+                <span class="badge text-bg-light text-dark border">Role: Manager</span>
+            </div>
+
+            <div class="admin-action-list">
+                <a class="admin-action" asp-controller="Leave" asp-action="Pending">
+                    <span class="admin-action__title">Approve or reject leave</span>
+                    <span class="admin-action__desc">Handle pending requests from employees</span>
+                </a>
+                <a class="admin-action" asp-controller="Tasks" asp-action="Index">
+                    <span class="admin-action__title">Assign and manage tasks</span>
+                    <span class="admin-action__desc">Track task ownership and progress</span>
+                </a>
+                <a class="admin-action" asp-controller="Rotations" asp-action="Index">
+                    <span class="admin-action__title">Modify rotation schedules</span>
+                    <span class="admin-action__desc">Review schedules and linked tasks</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="admin-panel-card h-100">
+            <h2 class="h5 fw-bold mb-3">Attendance snapshot</h2>
+            <p class="text-muted mb-4">Quick view of leave activity that can support attendance reporting.</p>
+            <div class="d-grid gap-2">
+                <a class="btn btn-outline-primary" asp-controller="Leave" asp-action="Index">View leave history</a>
+                <a class="btn btn-outline-primary" asp-controller="Dashboard" asp-action="Index">Refresh panel</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="admin-panel-card h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">Attendance reports</h2>
+                    <p class="text-muted mb-0">Approved leave and pending requests by user.</p>
+                </div>
+            </div>
+
+            @if (Model.AttendanceReportsPage.Items.Count == 0)
+            {
+                <div class="empty-state">
+                    <h3 class="h6 fw-bold mb-2">No attendance data yet</h3>
+                    <p class="text-muted mb-0">Leave activity will appear here as employees submit requests.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle task-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Approved this month</th>
+                                <th>Pending requests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in Model.AttendanceReportsPage.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@row.DisplayName</div>
+                                        <div class="text-muted small">User: @row.UserId</div>
+                                    </td>
+                                    <td>@row.ApprovedLeaveDaysThisMonth day@(row.ApprovedLeaveDaysThisMonth == 1 ? "" : "s")</td>
+                                    <td>
+                                        <span class="badge rounded-pill @(row.PendingLeaveRequests > 0 ? "text-bg-warning text-dark" : "text-bg-light text-dark border")">
+                                            @row.PendingLeaveRequests
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @await Html.PartialAsync("_Pagination", Model.AttendanceReportsPage.Pagination)
+            }
+        </div>
+    </div>
+</section>

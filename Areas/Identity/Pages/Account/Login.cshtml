@@ -1,0 +1,61 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="auth-shell">
+    <div class="row g-0 auth-card shadow-lg">
+        <div class="col-lg-5 auth-brand-panel text-white p-4 p-md-5">
+            <div class="d-flex flex-column h-100 justify-content-between">
+                <div>
+                    <span class="badge rounded-pill text-bg-light text-primary mb-4 px-3 py-2">MechincalHub</span>
+                    <h1 class="display-6 fw-bold mb-3">Welcome back</h1>
+                    <p class="lead text-white-50 mb-4">
+                        Sign in to manage attendance, leave requests, tasks, and rotations from one place.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7 bg-body p-4 p-md-5">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Sign in</h2>
+                    <p class="text-body-secondary mb-0">Use your email and password to continue.</p>
+                </div>
+            </div>
+
+            <form id="account" method="post" class="auth-form">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                    <label asp-for="Input.Email"></label>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="Password" />
+                    <label asp-for="Input.Password"></label>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <label class="form-check-label" asp-for="Input.RememberMe"></label>
+                    </div>
+                    <a class="link-primary text-decoration-none" asp-area="Identity" asp-page="/Account/Register">
+                        Need an account? Create one
+                    </a>
+                </div>
+
+                <button id="login-submit" type="submit" class="btn btn-primary btn-lg w-100">Sign in</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,48 @@
+@model HRSystem.Models.AdminRolesViewModel
+
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<div class="admin-page-shell">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Role matrix</h1>
+            <p class="text-muted mb-0">A quick overview of how access is split across the system.</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Admin" asp-action="Users">Manage users</a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var role in Model.Roles)
+        {
+            <div class="col-md-4">
+                <div class="admin-panel-card h-100">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">@role.Label</h2>
+                            <p class="text-muted mb-0">@role.Description</p>
+                        </div>
+                        <span class="badge rounded-pill text-bg-primary">@role.UserCount users</span>
+                    </div>
+
+                    <div class="admin-role-card__code text-uppercase small text-muted mb-2">@role.Value</div>
+                    <p class="mb-0">
+                        @if (role.Value == HRSystem.Infrastructure.AppRoles.Admin)
+                        {
+                            <span>Can manage the entire system, users, reports, settings, and role assignments.</span>
+                        }
+                        else if (role.Value == HRSystem.Infrastructure.AppRoles.Manager)
+                        {
+                            <span>Can handle approvals, tasks, rotations, and non-admin user oversight.</span>
+                        }
+                        else
+                        {
+                            <span>Can handle self-service requests, assigned tasks, and personal workflow actions.</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

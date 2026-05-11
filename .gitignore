@@ -1,0 +1,20 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET / local data
+app.db
+app.db-shm
+app.db-wal
+
+# Temporary files
+.buildtmp/
+artifacts/
+

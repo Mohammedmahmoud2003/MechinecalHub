@@ -1,0 +1,34 @@
+@model TaskItem
+@{
+    ViewData["Title"] = "Delete task";
+    var assignedTo = ViewBag.AssignedToUserName as string;
+}
+
+<div class="task-delete-shell">
+    <div class="task-delete-card">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-danger rounded-pill px-3 py-2">Delete task</span>
+            <span class="text-muted">This action cannot be undone.</span>
+        </div>
+
+        <h1 class="h3 fw-bold mb-2">Are you sure you want to delete this task?</h1>
+        <p class="text-muted mb-4">Review the details below before removing it from the board.</p>
+
+        <dl class="row task-detail-dl mb-4">
+            <dt class="col-sm-4">Title</dt>
+            <dd class="col-sm-8">@Model.Title</dd>
+
+            <dt class="col-sm-4">Assigned to</dt>
+            <dd class="col-sm-8">@((assignedTo ?? "—"))</dd>
+
+            <dt class="col-sm-4">Status</dt>
+            <dd class="col-sm-8"><span class="badge bg-secondary rounded-pill">@Model.Status</span></dd>
+        </dl>
+
+        <form asp-action="Delete" class="d-flex flex-wrap gap-2">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Delete task" class="btn btn-danger" />
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>

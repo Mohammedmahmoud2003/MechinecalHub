@@ -1,0 +1,120 @@
+@model HRSystem.Models.AdminUserEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Account";
+}
+
+<div class="admin-page-shell">
+    <section class="admin-panel-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill bg-primary px-3 py-2">Admin Only</span>
+                    <span class="badge rounded-pill text-bg-light text-dark border px-3 py-2">Edit account</span>
+                </div>
+                <h1 class="h3 fw-bold mb-2">Update employee account</h1>
+                <p class="text-muted mb-0">Update the employee profile, login email, and optionally reset the password from one screen.</p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-secondary" asp-action="Users">Back to users</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <form asp-action="Edit" method="post" class="vstack gap-3">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-0"></div>
+
+                    <div>
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <input asp-for="Email" class="form-control form-control-lg" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="ArabicName" class="form-label fw-semibold"></label>
+                        <input asp-for="ArabicName" class="form-control form-control-lg" />
+                        <span asp-validation-for="ArabicName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="EmployeeCode" class="form-label fw-semibold"></label>
+                            <input asp-for="EmployeeCode" class="form-control form-control-lg" />
+                            <span asp-validation-for="EmployeeCode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="JobTitle" class="form-label fw-semibold"></label>
+                            <input asp-for="JobTitle" class="form-control form-control-lg" />
+                            <span asp-validation-for="JobTitle" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="NewPassword" class="form-label fw-semibold"></label>
+                        <input asp-for="NewPassword" class="form-control form-control-lg" type="password" autocomplete="new-password" />
+                        <div class="form-text">Leave blank if you do not want to change the password.</div>
+                        <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-semibold">Username</label>
+                        <input class="form-control form-control-lg" value="@Model.UserName" disabled />
+                        <div class="form-text">This is shown for reference only and follows the email login in this app.</div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="fw-semibold mb-1">Current role</div>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="badge rounded-pill text-bg-light text-dark border">@Model.CurrentRoleLabel</span>
+                                @if (Model.IsCurrentUser)
+                                {
+                                    <span class="text-muted small">This is your own account.</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
+                        <a class="btn btn-outline-secondary btn-lg" asp-action="Users">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="admin-user-hero__side h-100">
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Employee</span>
+                        <strong class="admin-user-metric__value">@Model.ArabicName</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Code</span>
+                        <strong class="admin-user-metric__value">@Model.EmployeeCode</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Job title</span>
+                        <strong class="admin-user-metric__value">@Model.JobTitle</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Login name</span>
+                        <strong class="admin-user-metric__value">@Model.UserName</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Security</span>
+                        <strong class="admin-user-metric__value">Email confirmed on save</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

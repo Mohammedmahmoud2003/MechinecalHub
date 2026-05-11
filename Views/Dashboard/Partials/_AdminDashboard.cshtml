@@ -1,0 +1,212 @@
+@model DashboardViewModel
+
+<section class="admin-hero admin-hero--admin mb-4">
+    <div class="admin-hero__content">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Admin Control Center</span>
+            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Full Control</span>
+        </div>
+
+        <h1 class="display-5 fw-bold mb-3">Command accounts from one polished workspace.</h1>
+        <p class="lead mb-4 opacity-90">
+            Manage user accounts, assign roles, approve requests, and keep every queue visible without jumping across screens.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a class="btn btn-light btn-lg px-4" asp-controller="Admin" asp-action="Users">Accounts</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Admin" asp-action="ImportEmployees">Import workbook</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Admin" asp-action="Activity">Live changes</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Leave" asp-action="Pending">Review leave</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Tasks" asp-action="Index">Manage tasks</a>
+            <a class="btn btn-outline-light btn-lg px-4" asp-controller="Rotations" asp-action="Index">View rotations</a>
+        </div>
+
+        <div class="admin-chip-row">
+            <div class="admin-chip">
+                <span class="admin-chip__label">Users</span>
+                <span class="admin-chip__value">@Model.AdminSummary.TotalUsers</span>
+            </div>
+            <div class="admin-chip">
+                <span class="admin-chip__label">Requests</span>
+                <span class="admin-chip__value">@Model.AdminSummary.PendingLeaveRequests</span>
+            </div>
+            <div class="admin-chip">
+                <span class="admin-chip__label">Tasks</span>
+                <span class="admin-chip__value">@Model.AdminSummary.OpenTasks</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-hero__panel">
+        <div class="admin-hero__panel-label">System health</div>
+        <div class="admin-hero__panel-value">Live overview</div>
+        <p class="mb-4 text-white-50">A compact snapshot of the work queues you need to watch first.</p>
+
+        <div class="admin-hero__mini-grid">
+            <div>
+                <div class="admin-hero__mini-label">Admins</div>
+                <div class="admin-hero__mini-value">@Model.AdminSummary.AdminUsers</div>
+            </div>
+            <div>
+                <div class="admin-hero__mini-label">Supervisors</div>
+                <div class="admin-hero__mini-value">@Model.AdminSummary.SupervisorUsers</div>
+            </div>
+            <div>
+                <div class="admin-hero__mini-label">Employees</div>
+                <div class="admin-hero__mini-value">@Model.AdminSummary.EmployeeUsers</div>
+            </div>
+            <div>
+                <div class="admin-hero__mini-label">Unread</div>
+                <div class="admin-hero__mini-value">@Model.AdminSummary.UnreadNotifications</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="section-heading mb-3">
+        <div>
+            <h2 class="h4 fw-bold mb-1">Core Metrics</h2>
+            <p class="text-muted mb-0">A fast read on the health of the system.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-6 col-xl-3">
+            <div class="stat-card stat-card--primary">
+                <div class="stat-card__label">Total users</div>
+                <div class="stat-card__value">@Model.AdminSummary.TotalUsers</div>
+                <div class="stat-card__hint">All active accounts</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__label">Admins</div>
+                <div class="stat-card__value">@Model.AdminSummary.AdminUsers</div>
+                <div class="stat-card__hint">Full access roles</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card stat-card--indigo">
+                <div class="stat-card__label">Supervisors</div>
+                <div class="stat-card__value">@Model.AdminSummary.SupervisorUsers</div>
+                <div class="stat-card__hint">Review and approval roles</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card stat-card--slate">
+                <div class="stat-card__label">Employees</div>
+                <div class="stat-card__value">@Model.AdminSummary.EmployeeUsers</div>
+                <div class="stat-card__hint">Standard user accounts</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-card__label">Pending leave</div>
+                <div class="stat-card__value">@Model.AdminSummary.PendingLeaveRequests</div>
+                <div class="stat-card__hint">Requests awaiting action</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-card__label">Open tasks</div>
+                <div class="stat-card__value">@Model.AdminSummary.OpenTasks</div>
+                <div class="stat-card__hint">Pending or in progress</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-card__label">Active rotations</div>
+                <div class="stat-card__value">@Model.AdminSummary.ActiveRotations</div>
+                <div class="stat-card__hint">Planned and active cycles</div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="stat-card__label">Unread notifications</div>
+                <div class="stat-card__value">@Model.AdminSummary.UnreadNotifications</div>
+                <div class="stat-card__hint">Items that need attention</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="admin-panel-card h-100">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">Operational queue</h2>
+                <p class="text-muted mb-0">The queues that typically need action first.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary" asp-controller="Leave" asp-action="Pending">Leave approvals</a>
+                <a class="btn btn-sm btn-outline-primary" asp-controller="Tasks" asp-action="Index">Task board</a>
+                <a class="btn btn-sm btn-outline-primary" asp-controller="Rotations" asp-action="Index">Rotations</a>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="queue-tile">
+                    <div class="queue-tile__label">Pending leave</div>
+                    <div class="queue-tile__value">@Model.AdminSummary.PendingLeaveRequests</div>
+                    <p class="queue-tile__text mb-3">Requests waiting for approval or rejection.</p>
+                    <a class="queue-tile__link" asp-controller="Leave" asp-action="Pending">Open queue</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="queue-tile">
+                    <div class="queue-tile__label">Open tasks</div>
+                    <div class="queue-tile__value">@Model.AdminSummary.OpenTasks</div>
+                    <p class="queue-tile__text mb-3">Assignments that are still in progress.</p>
+                    <a class="queue-tile__link" asp-controller="Tasks" asp-action="Index">Open board</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="queue-tile">
+                    <div class="queue-tile__label">Active rotations</div>
+                    <div class="queue-tile__value">@Model.AdminSummary.ActiveRotations</div>
+                    <p class="queue-tile__text mb-3">Live rotations and planned schedules.</p>
+                    <a class="queue-tile__link" asp-controller="Rotations" asp-action="Index">Open timeline</a>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-2">User management</h2>
+                <p class="text-muted mb-0">Create and manage user accounts, then edit, delete, and assign roles from here.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge rounded-pill text-bg-light text-dark border">Admin only</span>
+                <span class="badge rounded-pill text-bg-primary">Accounts</span>
+            </div>
+        </div>
+
+        <div class="admin-action-list">
+            <a class="admin-action" asp-controller="Admin" asp-action="Users">
+                <span class="admin-action__title">Create account</span>
+                <span class="admin-action__desc">Add admins, supervisors, or employees</span>
+            </a>
+            <a class="admin-action" asp-controller="Admin" asp-action="ImportEmployees">
+                <span class="admin-action__title">Import employees</span>
+                <span class="admin-action__desc">Load the rotation workbook and generate accounts</span>
+            </a>
+            <a class="admin-action" asp-controller="Admin" asp-action="Activity">
+                <span class="admin-action__title">View live changes</span>
+                <span class="admin-action__desc">See recent creates, edits, deletes, and imports</span>
+            </a>
+            <a class="admin-action" asp-controller="Dashboard" asp-action="Index">
+                <span class="admin-action__title">Refresh overview</span>
+                <span class="admin-action__desc">Reload the latest queue status</span>
+            </a>
+            <a class="admin-action" asp-controller="Leave" asp-action="Pending">
+                <span class="admin-action__title">Review requests</span>
+                <span class="admin-action__desc">Jump straight to approvals</span>
+            </a>
+        </div>
+
+    </div>
+</section>

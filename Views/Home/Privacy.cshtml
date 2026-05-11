@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <section class="p-4 p-md-5 bg-white rounded-4 shadow-sm mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                    <div>
+                        <p class="text-uppercase text-muted small fw-semibold mb-2">Privacy & Data Use</p>
+                        <h1 class="display-6 fw-bold mb-3">Privacy Policy</h1>
+                        <p class="lead text-muted mb-0">
+                            This page explains how MechincalHub handles account, attendance, leave, task, and rotation data for employees, supervisors, and admins.
+                        </p>
+                    </div>
+                    <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Index">Back to home</a>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 h-100">
+                            <h2 class="h5 fw-bold mb-3">What we collect</h2>
+                            <ul class="mb-0 text-muted">
+                                <li>Account details such as name, email, and role</li>
+                                <li>Leave requests, approvals, and related comments</li>
+                                <li>Assigned tasks, status updates, and rotation schedules</li>
+                                <li>Attendance or check-in records when enabled</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 h-100">
+                            <h2 class="h5 fw-bold mb-3">How we use it</h2>
+                            <ul class="mb-0 text-muted">
+                                <li>To authenticate users and control access by role</li>
+                                <li>To manage HR workflows and approvals</li>
+                                <li>To show relevant dashboards and work queues</li>
+                                <li>To keep the system secure and auditable</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 h-100">
+                            <h2 class="h5 fw-bold mb-3">Data access</h2>
+                            <p class="text-muted mb-0">
+                                Administrators can access all system records. Supervisors can access team workflows they are responsible for. Employees can access their own data and assigned work.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="border rounded-4 p-4 h-100">
+                            <h2 class="h5 fw-bold mb-3">Retention and security</h2>
+                            <p class="text-muted mb-0">
+                                Data is kept only as long as needed for business operations and compliance. Access is protected through role-based authorization and secure sign-in.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-light rounded-4">
+                    <h2 class="h5 fw-bold mb-2">Questions or requests</h2>
+                    <p class="text-muted mb-0">
+                        If you need clarification about data handling, contact the system administrator or your HR contact for guidance.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

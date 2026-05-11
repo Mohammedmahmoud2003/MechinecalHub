@@ -1,0 +1,177 @@
+@model HRSystem.Models.EmployeeImportResultViewModel
+
+@{
+    ViewData["Title"] = "Import Employees";
+}
+
+<div class="admin-page-shell">
+    <section class="admin-panel-card mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill bg-primary px-3 py-2">Admin Only</span>
+                    <span class="badge rounded-pill text-bg-light text-dark border px-3 py-2">Workbook import</span>
+                </div>
+                <h1 class="h3 fw-bold mb-2">Import employee accounts from the rotation sheet</h1>
+                <p class="text-muted mb-0">
+                    Upload the Excel rotation workbook, and the app will create or update employee accounts, profiles, and the linked rotation schedule from the sheet rows.
+                    Emails are generated from the employee code so they are unique and easy to manage.
+                </p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-secondary" asp-action="Users">Back to users</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <form asp-action="ImportEmployees" method="post" enctype="multipart/form-data" class="vstack gap-3">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-0"></div>
+
+                    <div>
+                        <label class="form-label fw-semibold" for="workbook">Rotation workbook</label>
+                        <input class="form-control form-control-lg" type="file" id="workbook" name="workbook" accept=".xlsx" />
+                        <div class="form-text">Upload the Excel file that contains the employee rotation sheet.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">Import employees</button>
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="admin-user-hero__side h-100">
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Email pattern</span>
+                        <strong class="admin-user-metric__value">code@bahr-elbaqar.local</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Password pattern</span>
+                        <strong class="admin-user-metric__value">Emp@code</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Role assigned</span>
+                        <strong class="admin-user-metric__value">Employee</strong>
+                    </div>
+                    <div class="admin-user-metric">
+                        <span class="admin-user-metric__label">Rotation table</span>
+                        <strong class="admin-user-metric__value">Daily statuses saved and synced to leave</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (Model.Rows.Items.Count > 0)
+    {
+        <section class="admin-panel-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h2 class="h4 fw-bold mb-1">Import summary</h2>
+                    <p class="text-muted mb-0">Created, updated, and the rotation schedule saved from the workbook.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge text-bg-dark">@Model.ParsedRows parsed</span>
+                    <span class="badge text-bg-success">@Model.CreatedUsers created</span>
+                    <span class="badge text-bg-primary">@Model.UpdatedUsers updated</span>
+                    <span class="badge text-bg-warning text-dark">@Model.ScheduleEntries schedule rows</span>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card__label">Rotation title</div>
+                        <div class="stat-card__value" style="font-size:1.05rem;">@Model.RotationTitle</div>
+                        <div class="stat-card__hint">Imported from @Model.SheetName</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card__label">Date range</div>
+                        <div class="stat-card__value" style="font-size:1.05rem;">
+                            @if (Model.RotationStart.HasValue && Model.RotationEnd.HasValue)
+                            {
+                                <span>@Model.RotationStart.Value.ToString("yyyy-MM-dd") to @Model.RotationEnd.Value.ToString("yyyy-MM-dd")</span>
+                            }
+                        </div>
+                        <div class="stat-card__hint">Stored as a rotation period</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card__label">Imported at</div>
+                        <div class="stat-card__value">@Model.ImportedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                        <div class="stat-card__hint">Workbook upload timestamp</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-card__label">Stored entries</div>
+                        <div class="stat-card__value">@Model.ScheduleEntries</div>
+                        <div class="stat-card__hint">Daily status records</div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Errors.Count > 0)
+            {
+                <div class="alert alert-warning border-0 shadow-sm">
+                    <div class="fw-semibold mb-2">Some rows could not be processed</div>
+                    <ul class="mb-0">
+                        @foreach (var error in Model.Errors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table align-middle admin-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Arabic name</th>
+                            <th>Job title</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.Rows.Items)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@row.Code</td>
+                                <td>@row.Name</td>
+                                <td>@row.JobTitle</td>
+                                <td class="text-nowrap">@row.Email</td>
+                                <td class="text-nowrap">
+                                    @if (string.IsNullOrWhiteSpace(row.Password))
+                                    {
+                                        <span class="text-muted">Unchanged</span>
+                                    }
+                                    else
+                                    {
+                                        @row.Password
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-light text-dark border">@row.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @await Html.PartialAsync("_Pagination", Model.Rows.Pagination)
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,170 @@
+@using System.Security.Claims
+@model TasksIndexViewModel
+@{
+    ViewData["Title"] = "Tasks";
+    var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var items = Model.Tasks.Items;
+    var assignedUsers = ViewBag.AssignedUsersById as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var taskCount = Model.TotalCount;
+    var pendingCount = Model.PendingCount;
+    var inProgressCount = Model.InProgressCount;
+    var completedCount = Model.CompletedCount;
+}
+
+<div class="task-page-shell">
+    <section class="task-hero mb-4">
+        <div class="task-hero__content">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Task Management</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">@taskCount total</span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Track work, owners, and progress in one place.</h1>
+            <p class="lead mb-4 text-white-50">
+                Use this board to create tasks, review status, and see who each item is assigned to without opening every record.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-action="Create">New task</a>
+                <a class="btn btn-outline-light btn-lg px-4" asp-action="Daily">Manage daily tasks</a>
+                <form asp-action="LoadDailyTasks" method="post" class="d-inline" data-load-daily-form="true">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-light btn-lg px-4" data-load-daily-btn="true">
+                        <span class="load-label">Load daily tasks</span>
+                        <span class="spinner-border spinner-border-sm ms-2 d-none" aria-hidden="true"></span>
+                    </button>
+                </form>
+                <a class="btn btn-outline-light btn-lg px-4" asp-controller="Dashboard" asp-action="Index">Back to home</a>
+            </div>
+        </div>
+
+        <div class="task-hero__stats">
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Pending</span>
+                <strong class="task-hero__stat-value">@pendingCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">In progress</span>
+                <strong class="task-hero__stat-value">@inProgressCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Completed</span>
+                <strong class="task-hero__stat-value">@completedCount</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="task-table-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">Task board</h2>
+                <p class="text-muted mb-0">Each row shows ownership, status, due date, and linked rotation.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge text-bg-light text-dark border">Assigned user</span>
+                <span class="badge text-bg-light text-dark border">Rotation</span>
+                <span class="badge text-bg-light text-dark border">Created</span>
+            </div>
+        </div>
+
+        @if (!items.Any())
+        {
+            <div class="empty-state">
+                <h3 class="h5 fw-bold mb-2">No tasks yet</h3>
+                <p class="text-muted mb-3">Create the first task to start building the board.</p>
+                <a class="btn btn-primary" asp-action="Create">Create task</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle table-hover task-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Assigned to</th>
+                            <th>Status</th>
+                            <th>Due</th>
+                            <th>Rotation</th>
+                            <th>Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in items)
+                        {
+                            var statusClass = item.Status switch
+                            {
+                                TaskItemStatus.Pending => "bg-warning text-dark",
+                                TaskItemStatus.InProgress => "bg-primary",
+                                TaskItemStatus.Completed => "bg-success",
+                                TaskItemStatus.Cancelled => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+
+                            var assignedName = !string.IsNullOrWhiteSpace(item.AssignedToUserId) && assignedUsers.TryGetValue(item.AssignedToUserId, out var displayName)
+                                ? displayName
+                                : "-";
+
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.Title</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <div class="text-muted small text-truncate task-row-description">@item.Description</div>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="task-pill">@assignedName</span>
+                                </td>
+                                <td>
+                                    <span class="badge @statusClass rounded-pill px-3 py-2">@item.Status</span>
+                                </td>
+                                <td>
+                                    <span class="text-nowrap">@(item.DueDate?.ToString("d") ?? "-")</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@(item.Rotation?.Title ?? "-")</span>
+                                </td>
+                                <td>
+                                    <span class="text-nowrap">@item.CreatedAtUtc.ToString("g")</span>
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    @if (item.Status == TaskItemStatus.InProgress && string.Equals(item.AssignedToUserId, uid, StringComparison.Ordinal))
+                                    {
+                                        <form asp-action="Complete" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success">Complete</button>
+                                        </form>
+                                    }
+                                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @await Html.PartialAsync("_Pagination", Model.Tasks.Pagination)
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            document.querySelectorAll('[data-load-daily-form="true"]').forEach((form) => {
+                form.addEventListener('submit', () => {
+                    const button = form.querySelector('[data-load-daily-btn="true"]');
+                    if (!button) return;
+
+                    button.disabled = true;
+                    const label = button.querySelector('.load-label');
+                    const spinner = button.querySelector('.spinner-border');
+                    if (label) label.textContent = 'Loading...';
+                    if (spinner) spinner.classList.remove('d-none');
+                });
+            });
+        })();
+    </script>
+}

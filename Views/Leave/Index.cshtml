@@ -1,0 +1,137 @@
+@model LeaveIndexViewModel
+@{
+    ViewData["Title"] = "Leave requests";
+    var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var items = Model.Requests.Items;
+    var usersById = ViewBag.UserNamesById as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var canReview = ViewBag.CanReviewLeaveRequests as bool? == true;
+    var boardTitle = canReview ? "Request board" : "My requests";
+    var boardHint = canReview
+        ? "See who requested leave, the dates, and the current status."
+        : "See only the leave requests you submitted.";
+}
+
+<div class="task-page-shell">
+    <section class="task-hero mb-4">
+        <div class="task-hero__content">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Leave Requests</span>
+                <span class="badge rounded-pill bg-primary px-3 py-2">@items.Count total</span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Manage time-off requests from one calm workspace.</h1>
+            <p class="lead mb-4 text-white-50">
+                Submit new leave, review statuses, and keep the request flow organized for employees and supervisors.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-action="Create">New request</a>
+                @if (canReview)
+                {
+                    <a class="btn btn-outline-light btn-lg px-4" asp-action="Pending">Review queue</a>
+                }
+            </div>
+        </div>
+
+        <div class="task-hero__stats">
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Pending</span>
+                <strong class="task-hero__stat-value">@Model.PendingCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Approved</span>
+                <strong class="task-hero__stat-value">@Model.ApprovedCount</strong>
+            </div>
+            <div class="task-hero__stat">
+                <span class="task-hero__stat-label">Draft</span>
+                <strong class="task-hero__stat-value">@Model.DraftCount</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="task-table-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">@boardTitle</h2>
+                <p class="text-muted mb-0">@boardHint</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover task-table">
+                <thead>
+                    <tr>
+                        <th>Dates</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        @if (!items.Any())
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state my-3">
+                                    <h3 class="h5 fw-bold mb-2">No leave requests yet</h3>
+                                    <p class="text-muted mb-3">Start by creating the first request.</p>
+                                    <a class="btn btn-primary" asp-action="Create">Create request</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            var days = item.EndDate.DayNumber - item.StartDate.DayNumber + 1;
+                            var employeeName = !string.IsNullOrWhiteSpace(item.EmployeeUserId) && usersById.TryGetValue(item.EmployeeUserId, out var displayName)
+                                ? displayName
+                                : item.EmployeeUserId;
+
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.StartDate</div>
+                                    <div class="text-muted small">to @item.EndDate (@days day@(days == 1 ? "" : "s"))</div>
+                                </td>
+                                <td>
+                                    <span class="task-pill">@employeeName</span>
+                                </td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case LeaveRequestStatus.Pending:
+                                            <span class="badge rounded-pill text-bg-warning text-dark">Pending</span>
+                                            break;
+                                        case LeaveRequestStatus.Approved:
+                                            <span class="badge rounded-pill text-bg-success">Approved</span>
+                                            break;
+                                        case LeaveRequestStatus.Rejected:
+                                            <span class="badge rounded-pill text-bg-danger">Rejected</span>
+                                            break;
+                                        case LeaveRequestStatus.Draft:
+                                            <span class="badge rounded-pill text-bg-secondary">Draft</span>
+                                            break;
+                                        case LeaveRequestStatus.Cancelled:
+                                            <span class="badge rounded-pill text-bg-dark">Cancelled</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-nowrap">@item.SubmittedAtUtc.ToString("g")</td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                    @if (item.Status is LeaveRequestStatus.Draft or LeaveRequestStatus.Pending && item.EmployeeUserId == uid)
+                                    {
+                                        <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @await Html.PartialAsync("_Pagination", Model.Requests.Pagination)
+    </section>
+</div>
