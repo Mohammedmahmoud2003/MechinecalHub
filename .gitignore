@@ -1,20 +1,39 @@
 # Build outputs
 bin/
 obj/
+out/
+publish/
 
-# Visual Studio
+# Visual Studio / VS Code / Rider
 .vs/
+.vscode/
+.idea/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
+*.csproj.user
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
 
 # ASP.NET / local data
 app.db
 app.db-shm
 app.db-wal
+*.mdf
+*.ldf
 
-# Temporary files
+# Logs and temp files
+*.log
+*.tmp
+*.temp
 .buildtmp/
 artifacts/
 
+# .NET secrets and packages
+secrets.json
+*.nupkg
+packages/
